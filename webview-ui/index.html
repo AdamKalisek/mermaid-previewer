@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvg@4.0.3/lib/umd.min.js"></script>
+    <title>Mermaid Preview</title>
+    <style>
+        /* Základní styly pro lepší čitelnost, později přesuneme do CSS souboru */
+        body {
+            padding: 10px;
+            color: var(--vscode-editor-foreground);
+            background-color: var(--vscode-editor-background);
+            font-family: var(--vscode-font-family);
+        }
+        textarea {
+            width: 95%;
+            height: 150px;
+            margin-bottom: 10px;
+            display: block;
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border: 1px solid var(--vscode-input-border);
+        }
+        button {
+            margin-right: 5px;
+            margin-bottom: 10px;
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: 1px solid var(--vscode-button-border);
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+        #preview-area {
+            border: 1px solid var(--vscode-editorWidget-border);
+            padding: 10px;
+            min-height: 100px;
+            background-color: var(--vscode-textCodeBlock-background); /* Lehce odlišené pozadí */
+        }
+        #error-area {
+            color: var(--vscode-errorForeground);
+            margin-top: 10px;
+            white-space: pre-wrap; /* Zachovat formátování chybové zprávy */
+        }
+    </style>
+</head>
+<body>
+    <textarea id="mermaid-input" placeholder="Zadejte Mermaid kód zde..."></textarea>
+    <button id="download-svg-button">Download SVG</button>
+    <button id="download-png-button">Download PNG</button>
+
+    <div id="preview-area">
+        <!-- Zde se zobrazí náhled -->
+    </div>
+    <div id="error-area">
+        <!-- Zde se zobrazí případné chyby -->
+    </div>
+
+    <!-- Skrytý canvas pro generování PNG -->
+    <canvas id="png-canvas" style="display: none;"></canvas>
+
+    <script type="module" src="./dist/webview-loader.js"></script>
+</body>
+</html>
