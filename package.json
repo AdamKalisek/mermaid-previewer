@@ -1,14 +1,15 @@
 {
   "name": "mermaid-previewer",
-  "displayName": "Mermaid Previewer",
+  "displayName": "Live Mermaid Previewer",
   "description": "Preview and download Mermaid diagrams",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "kalisada",
   "repository": {
     "type": "git",
     "url": "https://github.com/AdamKalisek/mermaid-previewer.git"
   },
   "license": "MIT",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.98.0"
   },
@@ -24,7 +25,7 @@
       "activitybar": [
         {
           "id": "mermaid-previewer-container",
-          "title": "Mermaid Previewer",
+          "title": "Live Mermaid Previewer",
           "icon": "$(preview)"
         }
       ]
@@ -35,7 +36,7 @@
           "id": "mermaidPreviewerView",
           "name": "Mermaid Input",
           "type": "webview",
-          "contextualTitle": "Mermaid Previewer"
+          "contextualTitle": "Live Mermaid Previewer"
         }
       ]
     }
