@@ -45,11 +45,11 @@ export class MermaidViewProvider implements vscode.WebviewViewProvider {
             message => {
                 switch (message.command) {
                     case 'downloadSvg':
-                        this.handleDownload(message.data, 'svg');
+                        this.handleDownload(message.data); // Removed format parameter
                         return;
-                    case 'downloadPng':
-                        this.handleDownload(message.data, 'png');
-                        return;
+                    // case 'downloadPng': // Removed
+                    //     this.handleDownload(message.data, 'png');
+                    //     return;
                     case 'saveInput': // Nový příkaz pro uložení vstupu
                         this._context.workspaceState.update(MermaidViewProvider.stateKey, message.data);
                         return;
@@ -66,35 +66,27 @@ export class MermaidViewProvider implements vscode.WebviewViewProvider {
         }
     }
 
-    // Metoda pro zpracování požadavku na stažení
-    private async handleDownload(data: string, format: 'svg' | 'png') {
+    // Metoda pro zpracování požadavku na stažení (zjednodušeno pouze pro SVG)
+    private async handleDownload(data: string) { // Removed format parameter
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders || workspaceFolders.length === 0) {
-            vscode.window.showErrorMessage('Pro uložení souboru otevřete složku nebo pracovní prostor.');
+            vscode.window.showErrorMessage('Pro uložení SVG souboru otevřete složku nebo pracovní prostor.'); // Updated message
             return;
         }
 
         // Použijeme první otevřenou složku jako cíl
         const folderUri = workspaceFolders[0].uri;
-        const fileName = `mermaid-output.${format}`;
+        const fileName = `mermaid-output.svg`; // Fixed filename
         const fileUri = vscode.Uri.joinPath(folderUri, fileName);
 
         try {
-            let contentBuffer: Uint8Array;
-            if (format === 'svg') {
-                // SVG je text, převedeme ho na Uint8Array
-                contentBuffer = new TextEncoder().encode(data);
-            } else {
-                // PNG je base64 data URL, musíme extrahovat data a dekódovat
-                const base64Data = data.split(',')[1]; // Odstraníme 'data:image/png;base64,'
-                if (!base64Data) {
-                    throw new Error('Neplatný formát PNG dat.');
-                }
-                contentBuffer = Buffer.from(base64Data, 'base64');
-            }
+            // SVG je text, převedeme ho na Uint8Array
+            const contentBuffer = new TextEncoder().encode(data);
+
+            // Removed PNG handling logic
 
             await vscode.workspace.fs.writeFile(fileUri, contentBuffer);
-            vscode.window.showInformationMessage(`Soubor ${fileName} byl úspěšně uložen.`);
+            vscode.window.showInformationMessage(`Soubor ${fileName} byl úspěšně uložen.`); // Updated message
 
         } catch (error) {
             console.error('Chyba při ukládání souboru:', error);
@@ -118,7 +110,7 @@ export class MermaidViewProvider implements vscode.WebviewViewProvider {
 
     private _getHtmlForWebview(webview: vscode.Webview): string {
         // Získání URI pro bundlovaný skript webview
-        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'dist', 'webview.js'));
+        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'dist', 'webview-loader.js')); // Opravený název souboru
         // URI pro jednotlivé knihovny už nepotřebujeme
 
         // Použití nonce pro povolení pouze specifických inline skriptů/stylů v CSP
@@ -133,11 +125,10 @@ export class MermaidViewProvider implements vscode.WebviewViewProvider {
 				<meta charset="UTF-8">
 
 				<!-- Content Security Policy -->
-                <!-- Zjednodušené pravidlo pro script-src -->
 				<meta http-equiv="Content-Security-Policy" content="
 					default-src 'none';
 					style-src ${webview.cspSource} 'unsafe-inline';
-					script-src 'nonce-${nonce}' ${webview.cspSource};
+					script-src 'nonce-${nonce}' https://cdn.jsdelivr.net; /* Allow CDN and local script with nonce */
 					img-src ${webview.cspSource} data:;
 					font-src ${webview.cspSource};
 				">
@@ -193,17 +184,20 @@ export class MermaidViewProvider implements vscode.WebviewViewProvider {
 			<body>
 				<textarea id="mermaid-input" placeholder="Zadejte Mermaid kód zde..."></textarea>
 				<button id="download-svg-button">Download SVG</button>
-				<button id="download-png-button">Download PNG</button>
+				<!-- <button id="download-png-button">Download PNG</button> Removed -->
 
 				<div id="preview-area">
 					<!-- Zde se zobrazí náhled -->
 				</div>
-				<div id="error-area">
+				<!-- <div id="error-area"> Removed as PNG generation was the main source of errors here -->
 					<!-- Zde se zobrazí případné chyby -->
-				</div>
+				<!-- </div> -->
 
-				<!-- Skrytý canvas pro generování PNG -->
-				<canvas id="png-canvas" style="display: none;"></canvas>
+				<!-- Skrytý canvas pro generování PNG - Removed -->
+				<!-- <canvas id="png-canvas" style="display: none;"></canvas> -->
+
+                <!-- Load Mermaid library from CDN -->
+                <script nonce="${nonce}" src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
                 <!-- Vložení jediného bundlovaného skriptu jako modulu -->
 				<script type="module" nonce="${nonce}" src="${scriptUri}"></script>

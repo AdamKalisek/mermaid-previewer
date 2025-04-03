@@ -1,4 +1,5 @@
-// Knihovny mermaid a Canvg jsou nyní načítány z CDN v index.html
+// import mermaid from 'mermaid'; // Removed, loaded via CDN now
+// import { Canvg } from 'canvg'; // Removed unused import
 
 // Získání přístupu k VS Code API pro komunikaci mezi webview a extensí
 // Tuto funkci lze volat pouze jednou
@@ -8,10 +9,10 @@ const vscode = acquireVsCodeApi();
 const mermaidInput = document.getElementById('mermaid-input');
 // const previewButton = document.getElementById('preview-button'); // Odstraněno
 const downloadSvgButton = document.getElementById('download-svg-button');
-const downloadPngButton = document.getElementById('download-png-button');
+// const downloadPngButton = document.getElementById('download-png-button'); // Removed
 const previewArea = document.getElementById('preview-area');
-const errorArea = document.getElementById('error-area');
-const pngCanvas = document.getElementById('png-canvas');
+const errorArea = document.getElementById('error-area'); // Keeping error area for Mermaid errors
+// const pngCanvas = document.getElementById('png-canvas'); // Removed
 
 let currentSvgContent = ''; // Proměnná pro uložení posledního vygenerovaného SVG
 
@@ -46,13 +47,13 @@ downloadSvgButton.addEventListener('click', () => {
     }
 });
 
-downloadPngButton.addEventListener('click', () => {
-    if (currentSvgContent) {
-        generateAndDownloadPng(currentSvgContent);
-    } else {
-        showError('Nejdříve vygenerujte náhled (Preview).');
-    }
-});
+// downloadPngButton.addEventListener('click', () => { // Removed listener
+//     if (currentSvgContent) {
+//         generateAndDownloadPng(currentSvgContent);
+//     } else {
+//         showError('Nejdříve vygenerujte náhled (Preview).');
+//     }
+// });
 
 // --- Funkce ---
 
@@ -89,70 +90,22 @@ async function renderPreview(mermaidCode) {
     }
 }
 
-// Asynchronní funkce pro generování PNG
-async function generateAndDownloadPng(svgContent) {
-    clearError();
-    const canvas = pngCanvas; // Použijeme náš skrytý canvas
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        showError('Nepodařilo se získat kontext canvasu.');
-        return;
-    }
-
-    try {
-        // Oprava SVG pro Canvg: nahradíme <br> za <br/>
-        const validSvgContent = svgContent.replace(/<br>/g, '<br/>');
-
-        // Použijeme importovaný Canvg s opraveným SVG
-        const v = await Canvg.fromString(ctx, validSvgContent);
-
-        // Nastavení rozměrů canvasu podle SVG (důležité pro správný export)
-        // Přidáme malý okraj pro jistotu
-        const margin = 10;
-        canvas.width = v.width + margin * 2;
-        canvas.height = v.height + margin * 2;
-
-        // Vyplníme pozadí bílou barvou (volitelné, jinak bude průhledné)
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Posuneme kreslení o okraj
-        ctx.translate(margin, margin);
-
-        // Vykreslení
-        await v.render();
-
-        // Získání dat jako PNG data URL
-        const pngDataUrl = canvas.toDataURL('image/png');
-
-        // Odeslání dat do extense
-        vscode.postMessage({
-            command: 'downloadPng',
-            data: pngDataUrl
-        });
-
-    } catch (error) {
-        console.error("Chyba při generování PNG:", error);
-         let errorMessage = 'Neznámá chyba při generování PNG.';
-         if (error instanceof Error) {
-            errorMessage = `Chyba při generování PNG: ${error.message}`;
-        } else if (typeof error === 'string') {
-            errorMessage = `Chyba při generování PNG: ${error}`;
-        }
-        showError(errorMessage);
-    } finally {
-         // Vyčištění canvasu a reset transformace
-         ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformace
-         ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-}
+// Removed generateAndDownloadPng function
 
 function showError(message) {
-    errorArea.textContent = message;
+    // Ensure errorArea still exists before trying to set textContent
+    if (errorArea) {
+        errorArea.textContent = message;
+    } else {
+        console.error("Error area element not found, cannot display message:", message);
+    }
 }
 
 function clearError() {
-    errorArea.textContent = '';
+    // Ensure errorArea still exists before trying to clear it
+    if (errorArea) {
+        errorArea.textContent = '';
+    }
 }
 
 // Zde můžeme později přidat listener pro zprávy z extense (pokud bude potřeba)

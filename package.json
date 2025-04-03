@@ -2,7 +2,7 @@
   "name": "mermaid-previewer",
   "displayName": "Live Mermaid Previewer",
   "description": "Preview and download Mermaid diagrams",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "kalisada",
   "repository": {
     "type": "git",
